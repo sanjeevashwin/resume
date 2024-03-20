@@ -8,8 +8,8 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to EC2 on master branch push
-    runs-on: ubuntu-latest
+    name: Deploy to EC2 on main branch push
+    runs-on: Amazon-Linux
 
     steps:
       - name: Checkout the files
@@ -18,21 +18,21 @@ jobs:
       - name: Deploy to Server 1
         uses: easingthemes/ssh-deploy@main
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY_EC2 }}
           REMOTE_HOST: ${{ secrets.HOST_DNS }}
-          REMOTE_USER: ${{ secrets.USERNAME }}
+          REMOTE_USER: ${{ secrets.USER_NAME }}
           TARGET: ${{ secrets.TARGET_DIR }}
 
       - name: Executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@main
         with:
           host: ${{ secrets.HOST_DNS }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          username: ${{ secrets.USER_NAME }}
+          key: ${{ secrets.SSH_KEY_EC2 }}
           script: |
-            sudo apt-get -y update
-            sudo apt-get install -y apache2
-            sudo systemctl start apache2
-            sudo systemctl enable apache2
+            sudo yum update -y 
+            sudo yum install -y httpd
+            sudo systemctl start httpd
+            sudo systemctl enable httpd
             cd home
             sudo mv * /var/www/html
